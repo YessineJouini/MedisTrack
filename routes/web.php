@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AgentTicketController;
 use App\Http\Controllers\StockController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -22,6 +23,7 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
+Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
 
 
 

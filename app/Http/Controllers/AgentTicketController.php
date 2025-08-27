@@ -1,6 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Notifications\LowStockNotification;
+use Illuminate\Support\Facades\Notification;
+use App\Models\User;
 
 use App\Models\Ticket;
 use Illuminate\Http\Request;
@@ -35,7 +38,8 @@ class AgentTicketController extends Controller
         return view('agent.show', compact('ticket'));
     }
 
-    public function updateStatus(Request $request, $id)
+
+public function updateStatus(Request $request, $id)
 {
     $request->validate([
         'status' => 'required|in:en_cours,en_attente,affectue,annule'
@@ -45,11 +49,17 @@ class AgentTicketController extends Controller
 
     if ($request->status === Ticket::STATUS_AFFECTUE && $ticket->status !== Ticket::STATUS_AFFECTUE) {
         foreach ($ticket->articles as $article) {
+            // Reduce stock
             $article->quantite -= $article->pivot->quantite_utilisee;
             $article->save();
 
-            if ($article->quantite <= 5) {
-               
+            // Check low stock
+            if ($article->quantite <= $article->min_stock) {
+                // Get all agents
+                $agents = User::where('role', 'agent')->get();
+
+                // Send notification
+                Notification::send($agents, new LowStockNotification($article));
             }
         }
     }
@@ -60,5 +70,6 @@ class AgentTicketController extends Controller
 
     return redirect()->route('agent.index')->with('success', 'Statut du ticket mis à jour avec succès.');
 }
+
 
 }

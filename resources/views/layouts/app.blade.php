@@ -34,6 +34,36 @@
                     <a href="{{ route('stock.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
                         <i class="fas fa-boxes"></i> Stocks
                     </a>
+              <div class="relative inline-block text-left">
+    <button id="notifButton" class="inline-flex items-center space-x-1 focus:outline-none">
+        <i class="fas fa-bell fa-lg"></i>
+        @php
+            $unread = Auth::user()->unreadNotifications->count();
+        @endphp
+        @if($unread > 0)
+            <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
+                {{ $unread }}
+            </span>
+        @endif
+    </button>
+
+    <!-- Dropdown -->
+    <div id="notifDropdown" class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+        <div class="py-1 max-h-80 overflow-y-auto">
+            @forelse(Auth::user()->notifications->take(10) as $notif)
+                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ $notif->read_at ? '' : 'font-bold' }}">
+                    {{ $notif->data['message'] ?? 'Nouvelle notification' }}
+                    <br>
+                    <small class="text-xs text-gray-400">{{ $notif->created_at->diffForHumans() }}</small>
+                </a>
+            @empty
+                <p class="px-4 py-2 text-sm text-gray-500">Aucune notification</p>
+            @endforelse
+        </div>
+    </div>
+</div>
+
+
                 @endif
             </div>
 
@@ -71,4 +101,19 @@
         </main>
     </div>
 </body>
+<script>
+    const button = document.getElementById('notifButton');
+    const dropdown = document.getElementById('notifDropdown');
+
+    button.addEventListener('click', () => {
+        dropdown.classList.toggle('hidden');
+    });
+
+    // Optional: click outside to close
+    window.addEventListener('click', (e) => {
+        if (!button.contains(e.target) && !dropdown.contains(e.target)) {
+            dropdown.classList.add('hidden');
+        }
+    });
+</script>
 </html>

@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Article extends Model
 {
-    protected $fillable = ['nom', 'quantite', 'prix'];
+    protected $fillable = ['nom', 'quantite', 'prix' , 'min_quantite'];
 
     public function tickets()
     {

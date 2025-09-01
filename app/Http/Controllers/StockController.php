@@ -28,9 +28,12 @@ class StockController extends Controller
         } else {
             $query->orderBy('nom', 'asc');
         }
+$articles = $query->get();
+       if (request()->is('admin/*')) {
+        return view('admin.stock.index', compact('articles'));
+    }
 
-        $articles = $query->get();
-        return view('stock.index', compact('articles'));
+    return view('stock.index', compact('articles'));
     }
 
     /**
@@ -38,7 +41,7 @@ class StockController extends Controller
      */
     public function create()
     {
-        return view('stock.create');
+        return view('admin.stock.create');
     }
 
     /**
@@ -46,15 +49,23 @@ class StockController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate([
-            'nom' => 'required|string|max:255',
-            'quantite' => 'required|integer|min:0',
-            'prix' => 'required|numeric|min:0'
-        ]);
+   $request->validate([
+    'nom' => 'required|string|max:255',
+    'min_stock' => 'required|integer|min:0',
+    'prix' => 'required|numeric|min:0',
+]);
 
-        Article::create($request->only(['nom', 'quantite', 'prix']));
+Article::create([
+    'nom' => $request->nom,
+    'quantite' => 0,
+    'min_stock' => $request->min_stock,
+    'prix' => $request->prix,
+]);
 
-        return redirect()->route('stock.index')
+
+
+
+        return redirect()->route('admin.stock.index')
                          ->with('success', 'Nouvel article ajouté au stock !');
     }
 
@@ -69,35 +80,31 @@ class StockController extends Controller
     /**
      * Show the form for editing stock of a specific article.
      */
-    public function edit(Article $article)
-    {
-        return view('stock.edit', compact('article'));
-    }
+   public function edit(Article $stock)
+{
+    return view('admin.stock.edit', ['article' => $stock]);
+}
 
-    /**
-     * Update the stock of an article.
-     */
-    public function update(Request $request, Article $article)
-    {
-        $request->validate([
-            'quantite' => 'required|integer|min:0',
-            'prix' => 'required|numeric|min:0'
-        ]);
+public function update(Request $request, Article $stock)
+{
+    $request->validate([
+        'nom' => 'required|string|max:255',
+        'quantite' => 'required|integer|min:0',
+        'prix' => 'required|numeric|min:0'
+    ]);
 
-        $article->update($request->only(['quantite', 'prix']));
+    $stock->update($request->only(['nom', 'quantite', 'prix']));
 
-        return redirect()->route('stock.index')
-                         ->with('success', "Stock de {$article->nom} mis à jour !");
-    }
+    return redirect()->route('admin.stock.index')
+                     ->with('success', "Stock de {$stock->nom} mis à jour !");
+}
 
-    /**
-     * Remove the specified article from stock.
-     */
-    public function destroy(Article $article)
-    {
-        $article->delete();
+public function destroy(Article $stock)
+{
+    $stock->delete();
 
-        return redirect()->route('stock.index')
-                         ->with('success', "Article supprimé du stock.");
-    }
+    return redirect()->route('admin.stock.index')
+                     ->with('success', "Article supprimé du stock.");
+}
+
 }

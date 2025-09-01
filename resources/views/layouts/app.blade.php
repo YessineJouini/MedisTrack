@@ -21,7 +21,7 @@
 <body class="bg-gray-100 font-sans antialiased">
     <div id="app">
         <!-- Navbar -->
-        <nav class="bg-white shadow-md sticky top-0 z-50">
+        <nav class="bg-white shadow-md sticky top-0 z-50000">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16 items-center">
 
@@ -96,9 +96,56 @@
 
 
         <!-- Main content -->
-        <main class="py-6">
-            @yield('content')
-        </main>
+        <div class="min-h-screen flex">
+            @if(Auth::check() && in_array(Auth::user()->role, ['Admin', 'admin', 'Administrateur', 'administrateur']))
+                <aside id="adminSidebar" class="w-64 bg-white text-gray-800 border-r border-gray-200 shadow-sm hidden md:flex flex-col transition-transform">
+                    <div class="p-4 text-lg font-semibold flex items-center gap-2 border-b border-gray-100">
+                        <img src="{{ asset('images/medis_logo.png') }}" alt="Logo" class="h-6 w-6">
+                        <span class="text-indigo-600">Admin Panel</span>
+                    </div>
+                    <nav class="flex-1 p-4 space-y-2">
+                        <a href="{{ route('admin.stock.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fas fa-box w-4"></i>
+                            <span>Articles</span>
+                        </a>
+                        <a href="{{ route('admin.factures.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-ticket"></i>
+                            <span>facture</span>
+                        </a>
+                        <a href="{{ route('admin.users.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fas fa-users w-4"></i>
+                            <span>Utilisateurs</span>
+                        </a>
+                        <a href="{{ route('agent.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fas fa-ticket-alt w-4"></i>
+                            <span>Tickets</span>
+                        </a>
+                           <a href="{{ route('agent.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                            <i class="fa-solid fa-chart-simple"></i>
+                            <span>Statistiques</span>
+                        </a>
+                        
+                    </nav>
+                    <div class="p-4 border-t border-gray-100">
+                        <a href="#" class="flex items-center gap-3 text-red-500 hover:bg-red-50 p-2 rounded" onclick="event.preventDefault(); document.getElementById('admin-logout-form').submit();">
+                            <i class="fas fa-sign-out-alt w-4"></i>
+                            <span>Logout</span>
+                        </a>
+                        <form id="admin-logout-form" action="{{ route('logout') }}" method="POST" class="hidden">@csrf</form>
+                    </div>
+                </aside>
+            @endif
+
+            <main class="flex-1 py-6">
+                @if (session('success'))
+    <div class="max-w-4xl mx-auto my-4 px-4 py-3 rounded bg-green-100 border border-green-400 text-green-700 flex items-center gap-2">
+        <i class="fas fa-check-circle"></i>
+        <span>{{ session('success') }}</span>
+    </div>
+@endif
+                @yield('content')
+            </main>
+        </div>
     </div>
 </body>
 <script>

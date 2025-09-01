@@ -6,6 +6,8 @@ use App\Http\Controllers\TicketController;
 use App\Http\Controllers\AgentTicketController;
 use App\Http\Controllers\StockController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\FactureController;
 
 Route::get('/', function () {
     return view('auth.login');
@@ -54,5 +56,17 @@ Route::post('/agent/tickets/{id}/status', [AgentTicketController::class, 'update
 // ----------------------
 // Stock Management
 // ----------------------
-Route::resource('/agent/stock', StockController::class);
+Route::resource('/agent/stock', StockController::class)->only(['index']);
 
+
+
+Route::prefix('admin')->name('admin.')->group(function () {
+    Route::resource('users', UserController::class);
+});
+Route::resource('/admin/stock', StockController::class, [
+    'as' => 'admin'
+]);
+
+Route::prefix('admin')->name('admin.')->group(function() {
+    Route::resource('factures', FactureController::class);
+});

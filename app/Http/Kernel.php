@@ -33,6 +33,6 @@ class Kernel extends HttpKernel
      * The application's route middleware.
      */
     protected $routeMiddleware = [
-        // No custom middleware registered for now to ease local testing
-    ];
+    'checkrole' => \App\Http\Middleware\CheckRoleMiddleware::class,
+];
 }

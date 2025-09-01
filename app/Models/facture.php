@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class Facture extends Model
 {
-    protected $fillable = ['montant', 'date', 'article_id'];
+    protected $fillable = ['montant', 'date', 'article_id' , 'quantite'];
 
     public function article()
     {

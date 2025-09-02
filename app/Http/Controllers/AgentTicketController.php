@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 use App\Notifications\LowStockNotification;
 use Illuminate\Support\Facades\Notification;
 use App\Models\User;
-
+use Illuminate\Support\Facades\DB;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 
@@ -56,10 +56,9 @@ public function updateStatus(Request $request, $id)
             // Check low stock
             if ($article->quantite <= $article->min_stock) {
                 // Get all agents
-                $agents = User::where('role', 'agent')->get();
-
+ $users = User::whereIn(DB::raw('LOWER(role)'), ['agent', 'admin'])->get();
                 // Send notification
-                Notification::send($agents, new LowStockNotification($article));
+                Notification::send($users, new LowStockNotification($article));
             }
         }
     }

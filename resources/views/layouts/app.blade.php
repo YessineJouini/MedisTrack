@@ -26,46 +26,52 @@
         <div class="flex justify-between h-16 items-center">
 
             <!-- Left: Agent links -->
-            <div class="flex items-center space-x-4">
-                @if(Auth::check() && Auth::user()->role === 'Agent')
-                    <a href="{{ route('agent.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
-                        <i class="fas fa-ticket-alt"></i> Tickets
-                    </a>
-                    <a href="{{ route('stock.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
-                        <i class="fas fa-boxes"></i> Stocks
-                    </a>
-              <div class="relative inline-block text-left">
-    <button id="notifButton" class="inline-flex items-center space-x-1 focus:outline-none">
-        <i class="fas fa-bell fa-lg"></i>
-        @php
-            $unread = Auth::user()->unreadNotifications->count();
-        @endphp
-        @if($unread > 0)
-            <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
-                {{ $unread }}
-            </span>
-        @endif
-    </button>
+           <div class="flex items-center space-x-4">
+    {{-- Agent-only links --}}
+    @if(Auth::check() && Auth::user()->role === 'Agent')
+        <a href="{{ route('agent.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
+            <i class="fas fa-ticket-alt"></i> Tickets
+        </a>
+        <a href="{{ route('stock.index') }}" class="text-gray-700 hover:text-indigo-600 px-3 py-2 rounded-md text-sm font-medium flex items-center gap-1">
+            <i class="fas fa-boxes"></i> Stocks
+        </a>
+    @endif
 
-    <!-- Dropdown -->
-    <div id="notifDropdown" class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
-        <div class="py-1 max-h-80 overflow-y-auto">
-            @forelse(Auth::user()->notifications->take(10) as $notif)
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ $notif->read_at ? '' : 'font-bold' }}">
-                    {{ $notif->data['message'] ?? 'Nouvelle notification' }}
-                    <br>
-                    <small class="text-xs text-gray-400">{{ $notif->created_at->diffForHumans() }}</small>
-                </a>
-            @empty
-                <p class="px-4 py-2 text-sm text-gray-500">Aucune notification</p>
-            @endforelse
+    {{-- 🔔 Bell visible for both Admin + Agent --}}
+    @if(Auth::check() && in_array(strtolower(Auth::user()->role), ['agent', 'admin']))
+        <div class="relative inline-block text-left">
+            <button id="notifButton" class="inline-flex items-center space-x-1 focus:outline-none">
+                <i class="fas fa-bell fa-lg"></i>
+                @php
+                    $unread = Auth::user()->unreadNotifications->count();
+                @endphp
+                @if($unread > 0)
+                    <span class="inline-flex items-center justify-center px-2 py-0.5 text-xs font-bold text-white bg-red-600 rounded-full">
+                        {{ $unread }}
+                    </span>
+                @endif
+            </button>
+
+            <!-- Dropdown -->
+            <div id="notifDropdown"
+                 class="origin-top-right absolute right-0 mt-2 w-64 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden">
+                <div class="py-1 max-h-80 overflow-y-auto">
+                    @forelse(Auth::user()->notifications->take(10) as $notif)
+                        <a href="#"
+                           class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 {{ $notif->read_at ? '' : 'font-bold' }}">
+                            {{ $notif->data['message'] ?? 'Nouvelle notification' }}
+                            <br>
+                            <small class="text-xs text-gray-400">{{ $notif->created_at->diffForHumans() }}</small>
+                        </a>
+                    @empty
+                        <p class="px-4 py-2 text-sm text-gray-500">Aucune notification</p>
+                    @endforelse
+                </div>
+            </div>
         </div>
-    </div>
+    @endif
 </div>
 
-
-                @endif
-            </div>
 
             <!-- Center / Logo -->
             <div class="absolute left-1/2 transform -translate-x-1/2">
@@ -120,7 +126,7 @@
                             <i class="fas fa-ticket-alt w-4"></i>
                             <span>Tickets</span>
                         </a>
-                           <a href="{{ route('agent.index') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
+                           <a href="{{ route('admin.admin.dashboard') }}" class="flex items-center gap-3 p-2 rounded hover:bg-indigo-50 hover:text-indigo-600 transition">
                             <i class="fa-solid fa-chart-simple"></i>
                             <span>Statistiques</span>
                         </a>
